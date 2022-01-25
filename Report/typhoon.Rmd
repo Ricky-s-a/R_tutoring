@@ -83,7 +83,7 @@ barplot(y,
 
 That's all for required code this time.
 
-# all code
+# All code
 ```{r, eval=FALSE}
 # get the url
 url <- "https://raw.githubusercontent.com/Ricky-s-a/R_tutoring/main/Data/typhoon.csv"
