@@ -1,0 +1,112 @@
+---
+title: "typhoon"
+author: "Rikiya Honda"
+date: "01/20/2021"
+output:   
+  html_document: 
+    toc: true
+    toc_depth: 3
+    toc_float: 
+      collapsed: true
+      smooth_scroll: true
+    code_folding: 'show'
+    number_section: false
+    theme: journal
+    highlight: tango
+    smart: true
+    fig_width: 7
+    fig_height: 6
+    fig_caption: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(message = FALSE,
+                      warning = FALSE,
+                      fig.height = 6,
+                      fig.width = 8)
+Sys.setenv(lang = "en")
+```
+
+# Foreword
+This is R code for `typhoon` data set. The objective is to visualise no. of typhoon hitting Japan on monthly basis. I used term columns a lot in this article, so if you are not familier with columns (and rows), [this website](https://www.guru99.com/difference-between-rows-and-columns.html) will help you the different between columns and rows.
+
+# Import data
+
+The below code works anywhere you use R. I upload the data to third party file sharing service, and so you do not need to import csv. data file from your local computer. The following code load data to your local R.
+
+```{r}
+# get the url
+url <- "https://raw.githubusercontent.com/Ricky-s-a/R_tutoring/main/Data/typhoon.csv"
+
+# set the dataset named as `typhoon`
+typhoon <- read.csv(url)
+```
+
+```{r}
+# check the data set before assing the name to each column
+head(typhoon)
+```
+
+# Tidy data
+
+Since the columns of `typhoon` make no sense at all, we need to assign the name attribute to each column.
+
+```{r}
+# reset names of the columns 
+columns <- c("year", month.abb, "annual_sum")
+
+# assign the name to each column of `typhoon`
+typhoon <- `names<-`(typhoon, columns)
+
+# check
+head(typhoon)
+```
+
+As you can see, now each column has each month abbreviation, so it easily to understand what each columns refers to.
+
+# Visualization
+
+
+Next, we will plot a barplot by using `barplot()` function.
+
+```{r}
+# no. of typhoons hitting japan each month
+y <- apply(typhoon[1:70, 2:13], 2, sum, na.rm = TRUE)
+
+# plot a bar plot
+barplot(y, 
+        ylim=c(0,80), 
+        xlab='Month', 
+        ylab = 'No. of Typhoons',
+        main='Typhoons Hitting Japan Each Month')
+```
+
+That's all for required code this time.
+
+# all code
+```{r, eval=FALSE}
+# get the url
+url <- "https://raw.githubusercontent.com/Ricky-s-a/R_tutoring/main/Data/typhoon.csv"
+
+typhoon <- read.csv(url)
+
+# reset names of the columns 
+columns <- c("year", month.abb, "annual_sum")
+typhoon <- `names<-`(typhoon, columns)
+
+# check
+head(typhoon)
+
+
+# no. of typhoons hitting japan each month
+y <- apply(typhoon[1:70, 2:13], 2, sum, na.rm = TRUE)
+
+# plot a bar plot
+barplot(y, 
+        ylim=c(0,80), 
+        xlab='Month', 
+        ylab = 'No. of Typhoons',
+        main='Typhoons Hitting Japan Each Month')
+```
+
+
