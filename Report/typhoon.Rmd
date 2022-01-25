@@ -5,7 +5,7 @@ date: "01/20/2021"
 output:   
   html_document: 
     toc: true
-    toc_depth: 3
+    toc_depth: 4
     toc_float: 
       collapsed: true
       smooth_scroll: true
@@ -109,4 +109,95 @@ barplot(y,
         main='Typhoons Hitting Japan Each Month')
 ```
 
+
+# Answers' to questions
+
+## 25 Jan 2022, 18:03
+```{r}
+# import data
+# typhoon <- read.csv("dirct_path")
+
+
+# reset names of the columns
+columns<-c("year",month.abb[month.abb],"annual_sum")
+typhoon<-`names<-`(typhoon,columns)
+
+# check
+ head(typhoon)
+
+# no. of typhoon hitting japan each month
+y<-apply(typhoon[1:70,2:13],2,sum,na.rm=TRUE)
+
+# plot bar plot
+barplot(y,ylim=c(0,80),xlab='Month',ylab='No. of Typhoons',main='Typhoons Hitting Japan Each Month')
+```
+
+### Ansewer
+
+I wasn't clear enough to break down the `columns" part.
+
+#### The Solution:
+Please replace `columns <- c("year", month.abb[month.abb], "annual_sum")` with `columns <- c("year", month.abb, "annual_sum")`.
+
+```{r, eval=FALSE}
+columns <- c("year", month.abb, "annual_sum")
+```
+
+
+
+#### The Explanation:
+As a brief explanation, `month.abb` is a sequence of the month's name stored in R, so we don't have to import it from anywhere else.
+If we simply write `month.abb`,  and then the below result would be shown. 
+
+```{r}
+month.abb
+```
+
+
+And so now, if we write `c("year",month.abb,"annual_sum")`, it automatically means `c("year", "Jan", "Feb", "Mar",  "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec", "annual_sum")`.
+
+```{r}
+# both codes are the same
+# the short one
+c("year", month.abb, "annual_sum")
+# the long one
+c("year", "Jan", "Feb", "Mar",  "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec", "annual_sum")
+```
+
+Please bear in mind that `c("year", "Jan", ..., "Dec", "annual_sum")` is just names and has not yet connected to the dataset `typhoon`.
+
+To connect column names with the dataset, we need to run:
+``typhoon<- `names<-` (typhoon,columns)``
+
+The above code means `columns` (name info) is assigned to the columns to the dataset `typhoon`.
+This might sound weird but probably the below comparison would give you a clear understanding. 
+
+<br/>
+
+**<Before assigning "columns" (name info) to `typhoon`>**
+```{r}
+# the original `typhoon` dataset
+typhoon_before <- read.csv(url)
+
+# show
+head(typhoon_before)
+```
+
+<br/>
+
+**<After assigning "columns" (name info) to `typhoon`>**
+```{r}
+# reset names of the columns
+columns<-c("year",month.abb[month.abb],"annual_sum")
+typhoon<-`names<-`(typhoon,columns)
+
+# show
+head(typhoon)
+```
+
+
+You can see columns (vertical name of the dataset) become non-sense to months abbreviation.
+
+Once you set the naming of columns, this information is passed to the function `barplot()`, so automatically the plot of the x-axis 
+becomes the abbreviation of months.
 
