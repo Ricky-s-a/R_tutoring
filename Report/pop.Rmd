@@ -1,0 +1,136 @@
+---
+title: "pop"
+author: "Rikiya Honda"
+ddate: "01/26/2021"
+output:   
+  html_document: 
+    toc: true
+    toc_depth: 4
+    toc_float: 
+      collapsed: true
+      smooth_scroll: true
+    code_folding: 'show'
+    number_section: false
+    theme: journal
+    highlight: tango
+    smart: true
+    fig_width: 7
+    fig_height: 6
+    fig_caption: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(message = FALSE,
+                      warning = FALSE,
+                      fig.height = 6,
+                      fig.width = 8)
+Sys.setenv(lang = "en")
+```
+
+
+
+# 手順1: import data
+
+
+```{r}
+# url for csv. file
+url <- "https://raw.githubusercontent.com/Ricky-s-a/R_tutoring/main/Data/pop.csv"
+
+# import data
+pop <- read.csv(url)
+
+# check
+head(pop)
+```
+
+
+# 手順2: modeling
+
+
+```{r}
+# define the linear model
+pop.lm <- lm(number ~ year, data = pop)
+```
+
+
+# 手順3: visualization
+
+
+```{r}
+# visualize
+plot(pop)
+abline(pop.lm, lwd = 2)
+
+# coefficients
+coefficients(pop.lm)
+
+# correlation
+cor(pop$year, pop$number)
+```
+
+
+# 手順4: the value estimation
+
+
+```{r}
+# estimate
+pop_estimate <- function(year) {pop.lm$coefficients[[1]] + pop.lm$coefficients[[2]]*year}
+```
+
+
+# 手順5: data summarization
+
+
+```{r}
+# summary
+summary(pop.lm)
+
+# set variables
+pop$pre <- predict(pop.lm)
+pop$res <- residuals(pop.lm)
+
+# check 
+head(pop)
+```
+
+
+# APPENDIX
+
+
+```{r}
+# load packages
+library(tidyverse)
+library(modelr)
+
+# define the data for visualization
+pop_plot <- pop %>% 
+  `names<-`(value = c("year", "raw", "predicted", "residual")) %>% 
+  pivot_longer(cols = c(-year))
+
+# raw v.s. expected value
+pop_plot %>% 
+  filter(name != "residual") %>% 
+  ggplot(aes(year, value, color = name)) +
+  geom_smooth(aes(color = name),
+              size = 0.1,
+              se = FALSE) +
+  geom_point() +
+  scale_x_continuous(breaks = seq(2000, 2010, by = 1)) +
+  labs(title = "The scatter plot of the predicted value and raw data about pop",
+       x = "Year",
+       y = "Population",
+       color = "Name")
+
+# residual  
+pop %>% 
+  ggplot(aes(year, res)) +
+  geom_ref_line(h = 0) +
+  geom_point() +
+  geom_smooth(se = FALSE) +
+  scale_x_continuous(breaks = seq(2000, 2010, by = 1)) +
+  labs(title = "The scatter plot about the residual",
+       x = "Year",
+       y = "Residuals")
+
+```
+
