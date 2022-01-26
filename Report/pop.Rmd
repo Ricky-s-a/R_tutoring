@@ -105,24 +105,44 @@ head(pop)
 ## the equaltion
 
 ### true model
+
+`number`と`year`を二つの変数としてとらえ、直線の関係で表すと以下のようになる。直線で`number`と`year`を説明した場合、説明できない部分が生じる。その値がresiduals（残渣）である。
+
+
 $$
-Number = \beta_1 + \beta_2Year + \epsilon\
+Number = \beta_1 + \beta_2Year + residuals
 $$
 
 ### estimated model
+
+推計されたモデルは以下のようになる。残渣が0になるように$\hat \beta_1$と$\hat \beta_2$が決められるため、残渣の項は式に含まれない。ここで注意しなければならないことは、上の式に書かれている$Number$と下の式で書かれている$\hat Number$は違う点である。このように変数に(hat)$\hat x$をつけると、その変数は推定された値であることを示している。ここでは、$Number$は実際の人口数を示しているのに対し、$\hat Number$は予測された値であり、実際の値$Number$とは違う点に気を付けてほしい。
+
+
+
+
 
 $$
 \hat Number = \hat \beta_1 + \hat \beta_2Year
 $$
 
+`lm()`を使って推定した、`pop.lm`を見てみると、値が切片の値が-74678.9545、傾きの値が100.9545となっていることがわかる。これを推定された式に代入すると以下のようになる。
+
+$$
+\hat Number = \hat 74678.9545 + \hat 100.9545Year
+$$
+
+この式が示しているところは、`Year`が1年増えると、`Number`が100.9545増える傾向になり、`Year`が0の時は、`Number`が74678.9545 になる傾向になるということである。実際問題として、`Year`が0になるケースはないため、今回のモデルの推計において、切片は役に立たない。
+
 ### residuals
 
-$u$をresidualsとして定義した場合、$u$は以下のように計算される。
+残渣(residuals)は、実際の値と予測値の差分で計算される。今回の場合だと、実際の人口数である$Number$と線形モデルによって推計された値である$\hat Number$の差分がそれぞれの年の残渣の値になる。
+
 
 $$
-u = Number - \hat Number 
+residuals = Number - \hat Number 
 $$
 
+以下ではイメージを作るため、実際の値を青で、予測値を赤で示すことによって、実際の値と予測値の差を示そうとしている。
 
 
 ```{r}
@@ -133,7 +153,7 @@ library(scales)
 
 # define the data for visualization
 pop_plot <- pop %>% 
-  `names<-`(value = c("year", "raw", "predicted", "residual")) %>% 
+  `names<-`(value = c("year", "real", "predicted", "residual")) %>% 
   pivot_longer(cols = c(-year))
 
 # raw v.s. expected value
@@ -148,7 +168,16 @@ pop_plot %>%
        x = "Year",
        y = "Population",
        color = "Name")
+```
 
+
+残渣のみを記述したのが以下のグラフである。横軸０は、残渣が０、つまり予測値と実際の値が同じ$(residuals = Number - \hat Number = 0)$であり、モデルの説明力が高いことを示している。一方、横軸の値が0から離れると、推計したモデルの説明力が低くなることを示している。2000年の残渣は、約-300、つまり、予測値と実際の値が-300外れており、実際の値よりも、予測値のほうが大きかったこと示している。
+$$
+Number - \hat Number < 0 \\
+Number < \hat Number
+$$
+
+```{r}
 # residual  
 pop %>% 
   ggplot(aes(year, res)) +
