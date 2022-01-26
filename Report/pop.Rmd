@@ -63,22 +63,32 @@ abline(pop.lm, lwd = 2)
 
 # coefficients
 coefficients(pop.lm)
+```
 
+
+```{r}
 # correlation
 cor(pop$year, pop$number)
 ```
 
 
-# 手順4: the value estimation
+相関係数について説明を加えると、一般的に相関係数の絶対値が0.3を下回ると関係性が弱いとされ、0.3から0.6の間は中程度の関係性があるといわれ、相関係数の絶対値が0.6以上の場合、強い相関があるといわれる。今回は、相関係数が$0.9189531$であり、かなり強い正の相関が観察される。
 
+# 手順4: parameter estimation
+
+以下ではモデルの予測値を確認する。
 
 ```{r}
-# estimate
-pop_estimate <- function(year) {pop.lm$coefficients[[1]] + pop.lm$coefficients[[2]]*year}
+# まず年を`2005`年に設定する
+year <- 2005
 
 # estimate the data for the year 2005
-pop_estimate(2005)
+-74678.9545 + 100.9545 * year
+```
 
+この結果を実際の2005年の値と比べてみると、$127768 - 127734.8 = 33.2$となり、2005年におけるモデルの精度は比較的高いのではないかと予測される。
+
+```{r}
 # the real value 
 pop[pop$year == 2005,2]
 ```

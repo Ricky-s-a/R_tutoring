@@ -1720,15 +1720,18 @@ div.tocify {
 <div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1"></a><span class="co"># correlation</span></span>
 <span id="cb7-2"><a href="#cb7-2"></a><span class="kw">cor</span>(pop<span class="op">$</span>year, pop<span class="op">$</span>number)</span></code></pre></div>
 <pre><code>## [1] 0.9189531</code></pre>
+<p>相関係数について説明を加えると、一般的に相関係数の絶対値が0.3を下回ると関係性が弱いとされ、0.3から0.6の間は中程度の関係性があるといわれ、相関係数の絶対値が0.6以上の場合、強い相関があるといわれる。今回は、相関係数が<span class="math inline">\(0.9189531\)</span>であり、かなり強い正の相関が観察される。</p>
 </div>
-<div id="手順4-the-value-estimation" class="section level1">
-<h1>手順4: the value estimation</h1>
-<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1"></a><span class="co"># estimate</span></span>
-<span id="cb9-2"><a href="#cb9-2"></a>pop_estimate &lt;-<span class="st"> </span><span class="cf">function</span>(year) {pop.lm<span class="op">$</span>coefficients[[<span class="dv">1</span>]] <span class="op">+</span><span class="st"> </span>pop.lm<span class="op">$</span>coefficients[[<span class="dv">2</span>]]<span class="op">*</span>year}</span>
+<div id="手順4-parameter-estimation" class="section level1">
+<h1>手順4: parameter estimation</h1>
+<p>以下ではモデルの予測値を確認する。</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1"></a><span class="co"># まず年を`2005`年に設定する</span></span>
+<span id="cb9-2"><a href="#cb9-2"></a>year &lt;-<span class="st"> </span><span class="dv">2005</span></span>
 <span id="cb9-3"><a href="#cb9-3"></a></span>
 <span id="cb9-4"><a href="#cb9-4"></a><span class="co"># estimate the data for the year 2005</span></span>
-<span id="cb9-5"><a href="#cb9-5"></a><span class="kw">pop_estimate</span>(<span class="dv">2005</span>)</span></code></pre></div>
-<pre><code>## [1] 127734.9</code></pre>
+<span id="cb9-5"><a href="#cb9-5"></a><span class="fl">-74678.9545</span> <span class="op">+</span><span class="st"> </span><span class="fl">100.9545</span> <span class="op">*</span><span class="st"> </span>year</span></code></pre></div>
+<pre><code>## [1] 127734.8</code></pre>
+<p>この結果を実際の2005年の値と比べてみると、<span class="math inline">\(127768 - 127734.8 = 33.2\)</span>となり、2005年におけるモデルの精度は比較的高いのではないかと予測される。</p>
 <div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1"></a><span class="co"># the real value </span></span>
 <span id="cb11-2"><a href="#cb11-2"></a>pop[pop<span class="op">$</span>year <span class="op">==</span><span class="st"> </span><span class="dv">2005</span>,<span class="dv">2</span>]</span></code></pre></div>
 <pre><code>## [1] 127768</code></pre>
