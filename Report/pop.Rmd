@@ -75,6 +75,12 @@ cor(pop$year, pop$number)
 ```{r}
 # estimate
 pop_estimate <- function(year) {pop.lm$coefficients[[1]] + pop.lm$coefficients[[2]]*year}
+
+# estimate the data for the year 2005
+pop_estimate(2005)
+
+# the real value 
+pop[pop$year == 2005,2]
 ```
 
 
@@ -95,6 +101,26 @@ head(pop)
 
 
 # APPENDIX
+
+## the equaltion
+
+### true model
+$$
+Number = \beta_1 + \beta_2Year + \epsilon\
+$$
+### estimated model
+$$
+\hat Number = \hat \beta_1 + \hat \beta_2Year
+$$
+
+### residuals
+
+$u$をresidualsとして定義した場合、$u$は以下のように計算される。
+
+$$
+u = Number - \hat Number 
+$$
+
 
 
 ```{r}
