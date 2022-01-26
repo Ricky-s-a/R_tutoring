@@ -171,6 +171,8 @@ pop_plot %>%
 ```
 
 
+<br/>
+
 残渣のみを記述したのが以下のグラフである。横軸０は、残渣が０、つまり予測値と実際の値が同じ$(residuals = Number - \hat Number = 0)$であり、モデルの説明力が高いことを示している。一方、横軸の値が0から離れると、推計したモデルの説明力が低くなることを示している。2000年の残渣は、約-300、つまり、予測値と実際の値が-300外れており、実際の値よりも、予測値のほうが大きかったこと示している。
 $$
 Number - \hat Number < 0 \\
@@ -185,7 +187,7 @@ pop %>%
   geom_point() +
   geom_line() +
   scale_x_continuous(breaks = seq(2000, 2010, by = 1)) +
-  labs(title = "The scatter plot about the residual",
+  labs(title = "The scatter plot of the residual",
        x = "Year",
        y = "Residuals")
 ```
