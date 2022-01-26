@@ -108,7 +108,9 @@ head(pop)
 $$
 Number = \beta_1 + \beta_2Year + \epsilon\
 $$
+
 ### estimated model
+
 $$
 \hat Number = \hat \beta_1 + \hat \beta_2Year
 $$
