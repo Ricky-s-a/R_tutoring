@@ -1,0 +1,205 @@
+---
+title: "cars"
+author: "Rikiya Honda"
+ddate: "02/06/2021"
+output:   
+  html_document: 
+    toc: true
+    toc_depth: 4
+    toc_float: 
+      collapsed: true
+      smooth_scroll: true
+    code_folding: 'hide'
+    number_section: true
+    theme: journal
+    highlight: tango
+    smart: true
+    fig_width: 7
+    fig_height: 6
+    fig_caption: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(message = FALSE,
+                      warning = FALSE,
+                      fig.height = 6,
+                      fig.width = 8)
+Sys.setenv(lang = "en")
+```
+
+# データセットcars
+
+今回は、データセット`cars`を用いた。このデータセットは、2つの変数と50の観測値から成り立っている。変数は、時間当たりのマイル数で計算された自動車のスピード(speed)と、そのスピードから自動車が停止するまでかかるフィート数(dist)から成り立っている。
+
+このデータセットは、Rにもともと組み込まれているものなので、`?cars`でデータセットの説明を表示できる。
+
+以下の`csv`のボタンをクリックすることでデータセットをダウンロードできる。
+
+
+```{r}
+cars <- datasets::cars
+
+# 確認
+DT::datatable(cars, 
+              rownames = FALSE, 
+              extensions = 'Buttons',
+              options = list(autoWidth = TRUE,
+                             pageLength = 5,
+                             dom = 'Bfrtip',
+                             buttons = list("csv"),
+                             scrollX = TRUE,
+                             scrollCollapse = TRUE),
+              class = 'cell-border stripe',
+              caption = "source: ")
+```
+
+
+# データセットの呼び出しを行う
+
+## データの読み込み（インポート）
+(2) データの読み込み（※ディレクトリについて）
+ここでは，主にCSV(Comma Separated Values)ファイルの読み込みについて説明する。
+（注）ディレクトリについて
+・Windowsではメニュー「ファイル」→「ディレクトリの変更」で指定できる
+・Macではメニュー「その他」→「作業ディレクトリの変更」
+実際に，それぞれの環境の中でデータを読み込むときは，ディレクトリの理解が不可欠になる。
+例えば，JドライブのRフォルダにある”sheet1.csv”を読み込むときは次のようにする
+（学院のPC教室ではJドライブに資料を格納しておく）。
+
+```{r, eval=FALSE}
+# データを読み込む
+cars <- read.csv("J:/R/cars.csv")
+```
+
+
+
+# データの構造・データの型を確認する
+
+```{r}
+# データの構造を確認する
+str(cars)
+
+# データの型を確認する
+class(cars)
+```
+
+
+# 以下の問いに答える
+
+## 回帰直線を追加した散布図を描画する
+
+
+```{r}
+# 回帰直線の係数を計算
+cars.lm <- lm(dist ~ speed, data = cars)
+
+# 散布図を表示
+plot(cars)
+abline(cars.lm, lwd = 2)
+```
+
+## 説明変量と説明変量は何か？　
+
+```{r}
+cars.lm
+```
+
+今回の回帰モデルは、時間当たりのマイル数のスピードと、そのスピードから停止するのにかかったフィート数(dist)との関係性について分析している。時間軸的に、スピードが上がり、そこから停止するという順番が考えられ、その逆は考えにくいため、今回はスピードが説明変量がスピードで、目的変量はそのスピードから停止するのにかかった距離である。傾きが正であるため、スピードが上がるにつれて、その停止にかかる距離が伸びていく傾向にあるということがいえる。
+
+
+## 2変量の相関関数
+
+```{r}
+# 相関関係を求める
+cor(cars$speed, cars$dist)
+```
+
+## 回帰直線の方程式を求める　（テキストp84）参照
+
+```{r}
+coef(cars.lm)
+```
+
+
+上記の結果から、今回の回帰係数は、切片が`r coef(cars.lm)[[1]]`で、傾きが`r coef(cars.lm)[[2]]`であることがわかる。これを線形の式に直すと、以下の通りになる。
+
+$$
+dist = `r coef(cars.lm)[[1]]` + `r coef(cars.lm)[[2]]` \times speed
+$$
+
+
+
+## 回帰直線の方程式から時速60マイル、の停止距離を求める
+
+
+```{r}
+# スピード時速60マイルを定義
+speed <- 60
+
+# `speed`を式に代入して停止するのに必要な距離を求める。
+-17.579095 +  3.932409 * speed
+```
+
+
+回帰モデル`cars.lm`より、時速60マイルの時に停止するのに必要な距離は、218.3654ftであることが予測される。
+
+
+# ファイル提出
+
+wordに張って提出する。
+
+
+# APPENDIX
+
+## summry of `cars.lm`
+```{r}
+summary(cars.lm)
+```
+
+# 予測値と残差
+残渣(residuals)は、実際の値と予測値の差分で計算される。
+
+以下の図だと、予測値の青の線と実際の値である赤の線の間が残差である。
+
+```{r}
+# load packages
+library(tidyverse)
+library(modelr)
+library(scales)
+
+# define the data for visualization
+cars_plot <- cars %>%
+  add_predictions(cars.lm) %>% 
+  add_residuals(cars.lm) %>% 
+  `names<-`(value = c("speed", "dist", "predicted_dist", "residuals")) %>% 
+  pivot_longer(cols = c(-speed))
+
+# raw v.s. expected value
+cars_plot %>% 
+  filter(name != "residuals") %>% 
+  ggplot(aes(speed, value, color = name)) +
+  geom_line() +
+  geom_point() +
+  labs(title = "The scatter plot of the predicted value and raw data based on `cars`",
+       x = "Speed (mph)",
+       y = "Distance (ft)",
+       color = "Name") +
+  theme_minimal()
+```
+
+実際の値であるスピードの変化によって生じる残差の値を、グラフ化したのが以下の図になる。
+
+```{r}
+# residual  
+cars_plot %>% 
+  filter(name == "residuals") %>% 
+  ggplot(aes(speed, value)) +
+  geom_hline(yintercept =  0, colour = "black", linetype = "dashed") +
+  geom_point() +
+  geom_line() +
+  labs(title = "The scatter plot of the residual",
+       x = "Speed",
+       y = "Residuals") +
+  theme_minimal()
+```
+
