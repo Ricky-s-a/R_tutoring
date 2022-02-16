@@ -217,6 +217,8 @@ kadai01_plot %>%
   ggplot(aes(pop, value, color = vars)) +
   geom_point() +
   geom_line() +
+  scale_x_continuous(labels = comma) +
+  scale_y_continuous(labels = comma) +
   labs(title = "The scatter plot of the predicted value and raw data based on `kadai01`",
        x = "# of population",
        y = "Electricity",
