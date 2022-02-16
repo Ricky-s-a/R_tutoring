@@ -147,7 +147,7 @@ abline(kadai.lm)
 
 # 6．残差（テキストp.83）の絶対値が比較的大きい都道府県に注目し、自身の考察を書きなさい。
 
-## 残渣を求める
+## 残差を求める
 
 ```{r, results="asis"}
 kadai01_result <- data.frame(kadai01, 
