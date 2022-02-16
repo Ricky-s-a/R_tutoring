@@ -201,6 +201,7 @@ summary(kadai.lm)
 # load packages
 library(modelr)
 library(scales)
+library(plotly)
 
 # define the data for visualization
 kadai01_plot <- kadai01 %>%
@@ -212,9 +213,10 @@ kadai01_plot <- kadai01 %>%
 
 
 # raw v.s. expected value
-kadai01_plot %>% 
+g1 <- 
+  kadai01_plot %>% 
   filter(vars != "residuals") %>% 
-  ggplot(aes(pop, value, color = vars)) +
+  ggplot(aes(pop, value, color = vars, label = pref)) +
   geom_point() +
   geom_line() +
   scale_x_continuous(labels = comma) +
@@ -224,27 +226,30 @@ kadai01_plot %>%
        y = "Electricity",
        color = "Name") +
   theme_minimal()
+
+ggplotly(g1)
 ```
 
 実際の値である人口の変化によって生じる残差の値を、グラフ化したのが以下の図になる。
 
 ```{r}
 # residual  
+
+library(ggrepel)
+
 kadai01_plot %>% 
   filter(vars == "residuals") %>% 
-  ggplot(aes(pop, value)) +
+  ggplot(aes(pop, value, label = pref)) +
   geom_hline(yintercept =  0, colour = "black", linetype = "dashed") +
   geom_point() +
   geom_line() +
-  ggrepel::geom_label_repel(
-    data = kadai01_plot %>% filter(vars == "residuals",
-                                            pop > 3000),
-    aes(label = pref), 
-    check_overlap = TRUE) +
-  labs(title = "The scatter plot of the residual",
+  geom_label_repel(nudge_x = TRUE, nudge_y = TRUE, check_overlap = TRUE) +
+    labs(title = "The scatter plot of the residual",
        x = "Pop",
        y = "Residuals") +
   theme_minimal()
+
+
 ```
 
 ## 日本地図
