@@ -139,26 +139,40 @@ $$
 # 5. 散布図および回帰直線の描画
 
 ```{r}
-plot(kadai01[,2:3])
+plot(kadai01[,2:3],
+     xlab = "Tthe Number of Population (thousands)",
+     ylab = "Electricity Consumption (million kWh")
 abline(kadai.lm)
 ```
 
 # 6．残差（テキストp.83）の絶対値が比較的大きい都道府県に注目し、自身の考察を書きなさい。
 
+## 残渣を求める
+
 ```{r, results="asis"}
-# 残渣を求める
 kadai01_result <- data.frame(kadai01, 
                       resid = resid(kadai.lm))
+```
 
+## 並び替える
 
-# 並び替える
-# kadai01_result[sort(kadai01_result$resid, decreasing = F, index = T),]
+```{r, eval=FALSE}
+head(kadai01_result[sort(kadai01_result$resid, decreasing = F, index = T)[[2]],], n = 10)
 
+# or
 kadai01_result %>% 
   arrange(desc(resid)) %>% 
   head(n = 10) %>% 
   knitr::kable()
 ```
+
+```{r, results="asis"}
+kadai01_result %>% 
+  arrange(desc(resid)) %>% 
+  head(n = 10) %>% 
+  knitr::kable()
+```
+
 
 
 # 7．自己ワーク
@@ -250,10 +264,10 @@ map2 <-
 
 ggplot(map2, aes(fill = residuals)) + 
   geom_sf(size = .1) +
-  labs(title = "都道府県別の残差") +
-  scale_fill_continuous_tableau(
-    name = "人口",
-    labels = scales::number_format(suffix = "千人", scale = 1, big.mark = ",")) +
+  labs(title = "The Residuals Ccross Japanese Prefectures") +
+  # scale_fill_continuous_tableau(
+  #   name = "Residuals",
+  #   labels = scales::number_format(suffix = "千人", scale = 1, big.mark = ",")) +
   theme_pander()
 ```
 
