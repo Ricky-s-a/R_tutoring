@@ -31,18 +31,18 @@ Sys.setenv(lang = "en")
 
 
 ```{r}
-library(readr)
+library(tidyverse)
 url <- "https://raw.githubusercontent.com/Ricky-s-a/R_tutoring/main/Data/kadai01.csv"
-# kadai01 <- readr::read_csv(url, locale = locale(encoding = "Shift-JIS"))
+kadai01 <- read_csv(url)
 
-kadai01 <- read.csv(url, encoding = "Shift-JIS")
-# kadai01 <- read.csv(url, encoding = "UTF-8")
+# path <- "~/R/project/R_tutoring/Git/R_tutoring/Data/kadai01.csv"
+# kadai01 <- read_csv(path, locale = locale())
 
 # show
 DT::datatable(kadai01, 
               rownames = FALSE, 
               extensions = 'Buttons',
-              options = list(autoWidth = TRUE,
+              options = list(autoWidth = FALSE,
                              pageLength = 5,
                              dom = 'Bfrtip',
                              buttons = list("csv"),
@@ -74,9 +74,9 @@ kadai01 <- read.csv("J:/R/kadai01.csv")
 
 # 1.　データの提示
 
-```{r}
+```{r,  results='asis'}
 # show the first 6 lines of `kadai01`
-head(kadai01)
+knitr::kable(head(kadai01))
 ```
 
 
@@ -135,7 +135,7 @@ abline(kadai.lm)
 
 # 6．残差（テキストp.83）の絶対値が比較的大きい都道府県に注目し、自身の考察を書きなさい。
 
-```{r}
+```{r, results="asis"}
 # 残渣を求める
 kadai01_result <- data.frame(kadai01, 
                       resid = resid(kadai.lm))
@@ -144,19 +144,21 @@ kadai01_result <- data.frame(kadai01,
 # 並び替える
 # kadai01_result[sort(kadai01_result$resid, decreasing = F, index = T),]
 
-library(tidyverse)
 kadai01_result %>% 
   arrange(desc(resid)) %>% 
-  head(n = 10)
+  head(n = 10) %>% 
+  knitr::kable()
 ```
 
 
-# 7．環境省が公表する「環境統計集（平成29年度版）」（URL: https://www.env.go.jp/doc/toukei/h29tbl.html）のデータを用いて、グラフを１つ作成し、考察しなさい。枠内には、①使用データとそのURL、②プログラムソース、③グラフ、④考察の４点を記載しなさい。なお、データ整形は、必ずしもRを使用しなくても良い。必要があれば、データ整形に関する説明も、①使用データの部分に記載しなさい。
+# 7．自己ワーク
+[環境省が公表する「環境統計集（平成29年度版）」](https://www.env.go.jp/doc/toukei/h29tbl.html)
+のデータを用いて、グラフを１つ作成し、考察しなさい。枠内には、①使用データとそのURL、②プログラムソース、③グラフ、④考察の４点を記載しなさい。なお、データ整形は、必ずしもRを使用しなくても良い。必要があれば、データ整形に関する説明も、①使用データの部分に記載しなさい。
 
 
 # ファイル提出
 
-wordに張って提出する
+コード等をwordに貼って、ファイルを提出する
 
 
 # APPENDIX
@@ -173,7 +175,6 @@ summary(kadai.lm)
 
 ```{r}
 # load packages
-library(tidyverse)
 library(modelr)
 library(scales)
 
