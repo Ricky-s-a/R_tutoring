@@ -1,7 +1,7 @@
 ---
 title: "kadai01"
 author: "Rikiya Honda"
-ddate: "02/06/2021"
+date: "`r lubridate::today()`"
 output:   
   html_document: 
     toc: true
@@ -32,11 +32,21 @@ Sys.setenv(lang = "en")
 
 ```{r}
 library(tidyverse)
-url <- "https://raw.githubusercontent.com/Ricky-s-a/R_tutoring/main/Data/kadai01.csv"
-kadai01 <- read_csv(url)
+path <- "~/R/project/R_tutoring/Git/R_tutoring/Data/kadai01.csv"
 
-# path <- "~/R/project/R_tutoring/Git/R_tutoring/Data/kadai01.csv"
-# kadai01 <- read_csv(path, locale = locale())
+df_raw <- read_csv(path, locale = locale(encoding = "UTF-8"))
+
+kadai01 <- df_raw %>% 
+  mutate(pref = c("Hokkaido", "Aomori", "Iwate", "Miyagi", "Akita", "Yamagata", 
+   "Fukushima", "Ibaraki", "Tochigi", "Gunma", "Saitama", "Chiba", 
+   "Tokyo", "Kanagawa", "Niigata", "Toyama", "Ishikawa", "Fukui", 
+   "Yamanashi", "Nagano", "Gifu", "Shizuoka", "Aichi", "Mie", "Shiga", 
+   "Kyoto", "Osaka", "Hyogo", "Nara", "Wakayama", "Tottori", "Shimane", 
+   "Okayama", "Hiroshima", "Yamaguchi", "Tokushima", "Kagawa", "Ehime", 
+   "Kochi", "Fukuoka", "Saga", "Nagasaki", "Kumamoto", "Oita", "Miyazaki", 
+   "Kagoshima", "Okinawa")
+  )
+
 
 # show
 DT::datatable(kadai01, 
@@ -182,15 +192,17 @@ library(scales)
 kadai01_plot <- kadai01 %>%
   add_predictions(kadai.lm) %>% 
   add_residuals(kadai.lm) %>% 
-  `names<-`(value = c("pref", "pop", "epc", "predicted_ep", "residuals")) %>% 
-  pivot_longer(cols = c(-pref, -pop))
+  `names<-`(value = c("pref", "pop", "epc", "predicted_epc", "residuals")) %>% 
+  pivot_longer(cols = c(-pref, -pop), names_to = "vars", values_to = "value")
+
+
 
 # raw v.s. expected value
 kadai01_plot %>% 
-  filter(name != "residuals") %>% 
-  ggplot(aes(pop, value, color = name)) +
-  geom_line() +
+  filter(vars != "residuals") %>% 
+  ggplot(aes(pop, value, color = vars)) +
   geom_point() +
+  geom_line() +
   labs(title = "The scatter plot of the predicted value and raw data based on `kadai01`",
        x = "# of population",
        y = "Electricity",
@@ -203,14 +215,47 @@ kadai01_plot %>%
 ```{r}
 # residual  
 kadai01_plot %>% 
-  filter(name == "residuals") %>% 
+  filter(vars == "residuals") %>% 
   ggplot(aes(pop, value)) +
   geom_hline(yintercept =  0, colour = "black", linetype = "dashed") +
   geom_point() +
   geom_line() +
+  ggrepel::geom_label_repel(
+    data = kadai01_plot %>% filter(vars == "residuals",
+                                            pop > 3000),
+    aes(label = pref), 
+    check_overlap = TRUE) +
   labs(title = "The scatter plot of the residual",
        x = "Pop",
        y = "Residuals") +
   theme_minimal()
 ```
+
+## 日本地図
+
+```{r}
+pacman::p_load("NipponMap", "sf", "ggthemes")
+
+map <- read_sf(system.file("shapes/jpn.shp", package = "NipponMap")[1],
+               crs = "+proj=longlat +datum=WGS84")
+
+map2 <- 
+  kadai01_plot %>%
+  pivot_wider(id_cols = c(pref, pop), names_from = vars, values_from = value) %>% 
+  rename(name = pref) %>%
+  left_join(map, by = "name") %>% 
+  st_sf()
+  
+
+
+ggplot(map2, aes(fill = residuals)) + 
+  geom_sf(size = .1) +
+  labs(title = "都道府県別の残差") +
+  scale_fill_continuous_tableau(
+    name = "人口",
+    labels = scales::number_format(suffix = "千人", scale = 1, big.mark = ",")) +
+  theme_pander()
+```
+
+
 
