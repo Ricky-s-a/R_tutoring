@@ -1,0 +1,218 @@
+---
+title: "kadai01"
+author: "Rikiya Honda"
+ddate: "02/06/2021"
+output:   
+  html_document: 
+    toc: true
+    toc_depth: 4
+    toc_float: 
+      collapsed: true
+      smooth_scroll: true
+    code_folding: 'hide'
+    number_section: true
+    theme: journal
+    highlight: tango
+    smart: true
+    fig_width: 7
+    fig_height: 6
+    fig_caption: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(message = FALSE,
+                      warning = FALSE,
+                      fig.height = 6,
+                      fig.width = 8)
+Sys.setenv(lang = "en")
+```
+
+# �?ータセ�?�?cars
+
+今回は、データセ�?�?`cars`を用�?た。この�?ータセ�?ト�?��?2つの変数と50の観測値から成り立って�?る。変数は、時間当たり�?�マイル数で計算された自動車�?�スピ�?��?(speed)と、そのスピ�?�ドから�?�動車が停止するまでかかるフィート数(dist)から成り立って�?る�?
+
+こ�?��?ータセ�?ト�?�、Rにもともと�?み込まれて�?るものなので、`?cars`で�?ータセ�?ト�?�説明を表示できる�?
+
+以下�?�`csv`のボタンをクリ�?クすることで�?ータセ�?トをダウンロードできる�?
+
+
+```{r}
+url <- "https://raw.githubusercontent.com/Ricky-s-a/R_tutoring/main/Data/kadai01.csv"
+kadai01 <- readr::read_csv(url)
+
+kadai01 <- read.csv(url, encoding = "Shift-JIS")
+
+# 確�?
+DT::datatable(kadai01, 
+              rownames = FALSE, 
+              extensions = 'Buttons',
+              options = list(autoWidth = TRUE,
+                             pageLength = 5,
+                             dom = 'Bfrtip',
+                             buttons = list("csv"),
+                             scrollX = TRUE,
+                             scrollCollapse = TRUE),
+              class = 'cell-border stripe',
+              caption = "source: ")
+```
+
+
+# �?ータセ�?ト�?�呼び出しを行う
+
+## �?ータの読み込み?��インポ�?�ト�?
+(2) �?ータの読み込み?��※�?ィレクトリにつ�?て?�?
+ここでは?��主にCSV(Comma Separated Values)ファイルの読み込みにつ�?て説明する�?
+?��注?��ディレクトリにつ�?て
+・Windowsではメニュー「ファイル」�?�「ディレクトリの変更」で�?定できる
+・Macではメニュー「その他」�?�「作業�?ィレクトリの変更�?
+実際に?��それぞれ�?�環�?の中で�?ータを読み込むとき�?�?��ディレクトリの�?解が不可�?になる�?
+例えば?��Jドライブ�?�Rフォルダにある”sheet1.csv”を読み込むとき�?�次のようにする
+?��学院のPC教室ではJドライブに�?料を格納しておく?���?
+
+```{r, eval=FALSE}
+# �?ータを読み込む
+kadai01 <- read.csv("J:/R/kadai01.csv")
+```
+
+
+
+# 1.　�?ータの提示
+
+```{r}
+# �?ータの先�?�6行を確認す�?
+head(kadai01)
+```
+
+
+# 2?��基本統計量の計�?
+
+
+## 平�?値・最大値・最小値・中央値
+```{r}
+summary(kadai01)
+```
+
+## 不偏�?散
+```{r}
+lapply(kadai01[,2:3], var)
+```
+
+## 不偏標準偏差
+```{r}
+lapply(kadai01[,2:3], sd)
+```
+
+# 3?��相関係数の計算　
+
+```{r}
+cor(kadai01[,2], kadai01[,3])
+```
+
+
+
+
+# 4.　線形モ�?ルの生�??
+
+```{r}
+kadai.lm <- lm(epc ~ pop, data = kadai01)
+```
+
+## 回帰直線�?�方程式を求める　
+
+```{r}
+coef(kadai.lm)
+```
+
+
+上記�?�結果から、今回の回帰係数は、�??�?が`r coef(kadai.lm)[[1]]`で、傾きが`r coef(kadai.lm)[[2]]`であることがわかる。これを線形の式に直すと、以下�?�通りになる�?
+
+$$
+dist = `r coef(kadai.lm)[[1]]` + `r coef(kadai.lm)[[2]]` \times speed
+$$
+# 5. 散�?図および回帰直線�?�描画
+
+```{r}
+plot(kadai01[,2:3])
+abline(kadai.lm)
+```
+
+# 6?��残差?��テキス�?p.83?���?�絶対値が比�?�?大きい都道府県に注目し、�?�身の�?察を書きなさい�?
+
+```{r}
+# 残渣を求め�?
+kadai01_result <- data.frame(kadai01, 
+                      resid = resid(kadai.lm))
+
+
+# 並び替える
+# kadai01_result[sort(kadai01_result$resid, decreasing = F, index = T),]
+
+library(tidyverse)
+kadai01_result %>% 
+  arrange(desc(resid))
+```
+
+
+# 7?��環�?省が公表する「環�?統計集?��平�?29年度版）」�?URL: https://www.env.go.jp/doc/toukei/h29tbl.html?���?��?ータを用�?て、グラフを?��つ作�?�し、�?察しなさい。枠�?には、①使用�?ータとそ�?�URL、②プログラ�?ソース、③グラフ、④�?察�?�?��点を記載しなさい。なお、データ整形は、�?ずしもRを使用しなくても良�?。�?要があれば、データ整形に関する説明も、①使用�?ータの部�?に記載しなさい�?
+
+
+
+# ファイル提�?�
+
+wordに張って提�?�する�?
+
+
+# APPENDIX
+
+## summry of `kadai.lm`
+```{r}
+summary(kadai.lm)
+```
+
+## 予測値と残差
+残渣(residuals)は、実際の値と予測値の差�?で計算される�?
+
+以下�?�図�?と、予測値の青�?�線と実際の値である赤の線�?�間が残差である�?
+
+```{r}
+# load packages
+library(tidyverse)
+library(modelr)
+library(scales)
+
+# define the data for visualization
+kadai01_plot <- kadai01 %>%
+  add_predictions(kadai.lm) %>% 
+  add_residuals(kadai.lm) %>% 
+  `names<-`(value = c("pref", "pop", "epc", "predicted_ep", "residuals")) %>% 
+  pivot_longer(cols = c(-pref, -pop))
+
+# raw v.s. expected value
+kadai01_plot %>% 
+  filter(name != "residuals") %>% 
+  ggplot(aes(pop, value, color = name)) +
+  geom_line() +
+  geom_point() +
+  labs(title = "The scatter plot of the predicted value and raw data based on `kadai01`",
+       x = "# of population",
+       y = "Electricity",
+       color = "Name") +
+  theme_minimal()
+```
+
+実際の値であるスピ�?�ド�?�変化によって生じる残差の値を、グラフ化したのが以下�?�図になる�?
+
+```{r}
+# residual  
+kadai01_plot %>% 
+  filter(name == "residuals") %>% 
+  ggplot(aes(pop, value)) +
+  geom_hline(yintercept =  0, colour = "black", linetype = "dashed") +
+  geom_point() +
+  geom_line() +
+  labs(title = "The scatter plot of the residual",
+       x = "Pop",
+       y = "Residuals") +
+  theme_minimal()
+```
+
