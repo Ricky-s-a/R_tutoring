@@ -265,9 +265,13 @@ map2 <-
 ggplot(map2, aes(fill = residuals)) + 
   geom_sf(size = .1) +
   labs(title = "The Residuals Ccross Japanese Prefectures") +
-  # scale_fill_continuous_tableau(
-  #   name = "Residuals",
-  #   labels = scales::number_format(suffix = "千人", scale = 1, big.mark = ",")) +
+  scale_fill_gradient2(
+    name = "Residuals",
+    labels = scales::number_format(big.mark = ","),
+    low = "#15C6E3",
+    mid = "white",
+    high = "#EB7411",
+    midpoint = 0) +
   theme_pander()
 ```
 
