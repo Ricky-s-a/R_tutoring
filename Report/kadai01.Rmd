@@ -10,7 +10,7 @@ output:
       collapsed: true
       smooth_scroll: true
     code_folding: 'hide'
-    number_section: true
+    number_section: false
     theme: journal
     highlight: tango
     smart: true
@@ -27,22 +27,18 @@ knitr::opts_chunk$set(message = FALSE,
 Sys.setenv(lang = "en")
 ```
 
-# �?ータセ�?�?cars
-
-今回は、データセ�?�?`cars`を用�?た。この�?ータセ�?ト�?��?2つの変数と50の観測値から成り立って�?る。変数は、時間当たり�?�マイル数で計算された自動車�?�スピ�?��?(speed)と、そのスピ�?�ドから�?�動車が停止するまでかかるフィート数(dist)から成り立って�?る�?
-
-こ�?��?ータセ�?ト�?�、Rにもともと�?み込まれて�?るものなので、`?cars`で�?ータセ�?ト�?�説明を表示できる�?
-
-以下�?�`csv`のボタンをクリ�?クすることで�?ータセ�?トをダウンロードできる�?
+# データセット
 
 
 ```{r}
+library(readr)
 url <- "https://raw.githubusercontent.com/Ricky-s-a/R_tutoring/main/Data/kadai01.csv"
-kadai01 <- readr::read_csv(url)
+# kadai01 <- readr::read_csv(url, locale = locale(encoding = "Shift-JIS"))
 
 kadai01 <- read.csv(url, encoding = "Shift-JIS")
+# kadai01 <- read.csv(url, encoding = "UTF-8")
 
-# 確�?
+# show
 DT::datatable(kadai01, 
               rownames = FALSE, 
               extensions = 'Buttons',
@@ -57,42 +53,42 @@ DT::datatable(kadai01,
 ```
 
 
-# �?ータセ�?ト�?�呼び出しを行う
+# データセットの呼び出しを行う
 
-## �?ータの読み込み?��インポ�?�ト�?
-(2) �?ータの読み込み?��※�?ィレクトリにつ�?て?�?
-ここでは?��主にCSV(Comma Separated Values)ファイルの読み込みにつ�?て説明する�?
-?��注?��ディレクトリにつ�?て
-・Windowsではメニュー「ファイル」�?�「ディレクトリの変更」で�?定できる
-・Macではメニュー「その他」�?�「作業�?ィレクトリの変更�?
-実際に?��それぞれ�?�環�?の中で�?ータを読み込むとき�?�?��ディレクトリの�?解が不可�?になる�?
-例えば?��Jドライブ�?�Rフォルダにある”sheet1.csv”を読み込むとき�?�次のようにする
-?��学院のPC教室ではJドライブに�?料を格納しておく?���?
+## データの読み込み（インポート）
+(2) データの読み込み（※ディレクトリについて）
+ここでは，主にCSV(Comma Separated Values)ファイルの読み込みについて説明する。
+（注）ディレクトリについて
+・Windowsではメニュー「ファイル」→「ディレクトリの変更」で指定できる
+・Macではメニュー「その他」→「作業ディレクトリの変更」
+実際に，それぞれの環境の中でデータを読み込むときは，ディレクトリの理解が不可欠になる。
+例えば，JドライブのRフォルダにある”sheet1.csv”を読み込むときは次のようにする
+（学院のPC教室ではJドライブに資料を格納しておく）。
 
 ```{r, eval=FALSE}
-# �?ータを読み込む
+# データを読み込む
 kadai01 <- read.csv("J:/R/kadai01.csv")
 ```
 
 
 
-# 1.　�?ータの提示
+# 1.　データの提示
 
 ```{r}
-# �?ータの先�?�6行を確認す�?
+# show the first 6 lines of `kadai01`
 head(kadai01)
 ```
 
 
-# 2?��基本統計量の計�?
+# 2．基本統計量の計算
 
 
-## 平�?値・最大値・最小値・中央値
+## 平均値・最大値・最小値・中央値
 ```{r}
 summary(kadai01)
 ```
 
-## 不偏�?散
+## 不偏分散
 ```{r}
 lapply(kadai01[,2:3], var)
 ```
@@ -102,7 +98,7 @@ lapply(kadai01[,2:3], var)
 lapply(kadai01[,2:3], sd)
 ```
 
-# 3?��相関係数の計算　
+# 3．相関係数の計算
 
 ```{r}
 cor(kadai01[,2], kadai01[,3])
@@ -111,35 +107,36 @@ cor(kadai01[,2], kadai01[,3])
 
 
 
-# 4.　線形モ�?ルの生�??
+# 4.　線形モデルの生成
 
 ```{r}
 kadai.lm <- lm(epc ~ pop, data = kadai01)
 ```
 
-## 回帰直線�?�方程式を求める　
+## 回帰直線を方程式を求める　
 
 ```{r}
 coef(kadai.lm)
 ```
 
 
-上記�?�結果から、今回の回帰係数は、�??�?が`r coef(kadai.lm)[[1]]`で、傾きが`r coef(kadai.lm)[[2]]`であることがわかる。これを線形の式に直すと、以下�?�通りになる�?
+上記の結果から、今回の回帰係数は、切片が`r coef(kadai.lm)[[1]]`で、傾きが`r coef(kadai.lm)[[2]]`であることがわかる。これを線形の式に直すと、以下の通りになる。
 
 $$
-dist = `r coef(kadai.lm)[[1]]` + `r coef(kadai.lm)[[2]]` \times speed
+epc = `r coef(kadai.lm)[[1]]` + `r coef(kadai.lm)[[2]]` \times pop
 $$
-# 5. 散�?図および回帰直線�?�描画
+
+# 5. 散布図および回帰直線の描画
 
 ```{r}
 plot(kadai01[,2:3])
 abline(kadai.lm)
 ```
 
-# 6?��残差?��テキス�?p.83?���?�絶対値が比�?�?大きい都道府県に注目し、�?�身の�?察を書きなさい�?
+# 6．残差（テキストp.83）の絶対値が比較的大きい都道府県に注目し、自身の考察を書きなさい。
 
 ```{r}
-# 残渣を求め�?
+# 残渣を求める
 kadai01_result <- data.frame(kadai01, 
                       resid = resid(kadai.lm))
 
@@ -149,17 +146,17 @@ kadai01_result <- data.frame(kadai01,
 
 library(tidyverse)
 kadai01_result %>% 
-  arrange(desc(resid))
+  arrange(desc(resid)) %>% 
+  head(n = 10)
 ```
 
 
-# 7?��環�?省が公表する「環�?統計集?��平�?29年度版）」�?URL: https://www.env.go.jp/doc/toukei/h29tbl.html?���?��?ータを用�?て、グラフを?��つ作�?�し、�?察しなさい。枠�?には、①使用�?ータとそ�?�URL、②プログラ�?ソース、③グラフ、④�?察�?�?��点を記載しなさい。なお、データ整形は、�?ずしもRを使用しなくても良�?。�?要があれば、データ整形に関する説明も、①使用�?ータの部�?に記載しなさい�?
+# 7．環境省が公表する「環境統計集（平成29年度版）」（URL: https://www.env.go.jp/doc/toukei/h29tbl.html）のデータを用いて、グラフを１つ作成し、考察しなさい。枠内には、①使用データとそのURL、②プログラムソース、③グラフ、④考察の４点を記載しなさい。なお、データ整形は、必ずしもRを使用しなくても良い。必要があれば、データ整形に関する説明も、①使用データの部分に記載しなさい。
 
 
+# ファイル提出
 
-# ファイル提�?�
-
-wordに張って提�?�する�?
+wordに張って提出する
 
 
 # APPENDIX
@@ -170,9 +167,9 @@ summary(kadai.lm)
 ```
 
 ## 予測値と残差
-残渣(residuals)は、実際の値と予測値の差�?で計算される�?
+残渣(residuals)は、実際の値と予測値の差分で計算される。
 
-以下�?�図�?と、予測値の青�?�線と実際の値である赤の線�?�間が残差である�?
+以下の図だと、予測値の青の線と実際の値である赤の線の間が残差である。
 
 ```{r}
 # load packages
@@ -200,7 +197,7 @@ kadai01_plot %>%
   theme_minimal()
 ```
 
-実際の値であるスピ�?�ド�?�変化によって生じる残差の値を、グラフ化したのが以下�?�図になる�?
+実際の値である人口の変化によって生じる残差の値を、グラフ化したのが以下の図になる。
 
 ```{r}
 # residual  
