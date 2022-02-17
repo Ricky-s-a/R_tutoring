@@ -151,17 +151,19 @@ abline(kadai.lm)
 
 ```{r, results="asis"}
 kadai01_result <- data.frame(kadai01, 
-                      resid = resid(kadai.lm))
+                      resid = resid(kadai.lm),
+                      resid_abs = abs(resid(kadai.lm))
+                      )
 ```
 
 ## 並び替える
 
 ```{r, eval=FALSE}
-head(kadai01_result[sort(kadai01_result$resid, decreasing = F, index = T)[[2]],], n = 10)
+head(kadai01_result[sort(kadai01_result$resid_abs, decreasing = F, index = T)[[2]],], n = 10)
 
 # or
 kadai01_result %>% 
-  arrange(desc(resid)) %>% 
+  arrange(desc(resid_abs)) %>% 
   head(n = 10) %>% 
   knitr::kable()
 ```
@@ -269,7 +271,8 @@ map2 <-
   
 
 
-ggplot(map2, aes(fill = residuals)) + 
+g3 <- 
+  ggplot(map2, aes(fill = residuals, label = name)) + 
   geom_sf(size = .1) +
   labs(title = "The Residuals Accross Japanese Prefectures") +
   scale_fill_gradient2(
@@ -280,7 +283,13 @@ ggplot(map2, aes(fill = residuals)) +
     high = "#EB7411",
     midpoint = 0) +
   theme_pander()
+
+g3
+
+# ggplotly(g3) %>%
+#   widgetframe::frameWidget()
 ```
+
 
 
 
