@@ -150,8 +150,9 @@ abline(kadai.lm)
 ## 残差を求める
 
 ```{r}
+# define the dataset `kadai01_result`
 kadai01_result <- data.frame(kadai01, 
-                      resid = resid(kadai.lm), # residuals of the liner model
+                      resid = resid(kadai.lm), # residuals of the linear model
                       resid_abs = abs(resid(kadai.lm)) # absolute value of the residuals
                       )
 ```
@@ -159,6 +160,7 @@ kadai01_result <- data.frame(kadai01,
 ## 並び替える
 
 ```{r, eval=TRUE}
+# order `kadai01_result` 
 head(kadai01_result[sort(kadai01_result$resid_abs, decreasing = T, index = T)[[2]],], n = 10)
 ```
 
