@@ -30,7 +30,7 @@ Sys.setenv(lang = "en")
 # データセット
 
 
-```{r}
+```{r, echo=FALSE}
 library(tidyverse)
 path <- "~/R/project/R_tutoring/Git/R_tutoring/Data/kadai01.csv"
 
@@ -84,10 +84,10 @@ kadai01 <- read.csv("J:/R/kadai01.csv")
 
 # 1.　データの提示
 
-```{r,  results='asis'}
-# show the first 6 lines of `kadai01`
-knitr::kable(head(kadai01))
+```{r, eval=TRUE}
+head(kadai01)
 ```
+
 
 
 # 2．基本統計量の計算
@@ -151,28 +151,15 @@ abline(kadai.lm)
 
 ```{r, results="asis"}
 kadai01_result <- data.frame(kadai01, 
-                      resid = resid(kadai.lm),
-                      resid_abs = abs(resid(kadai.lm))
+                      resid = resid(kadai.lm), # residuals of the liner model
+                      resid_abs = abs(resid(kadai.lm)) # abosolute value of the residuals
                       )
 ```
 
 ## 並び替える
 
 ```{r, eval=FALSE}
-head(kadai01_result[sort(kadai01_result$resid_abs, decreasing = F, index = T)[[2]],], n = 10)
-
-# or
-kadai01_result %>% 
-  arrange(desc(resid_abs)) %>% 
-  head(n = 10) %>% 
-  knitr::kable()
-```
-
-```{r, results="asis"}
-kadai01_result %>% 
-  arrange(desc(resid)) %>% 
-  head(n = 10) %>% 
-  knitr::kable()
+head(kadai01_result[sort(kadai01_result$resid_abs, decreasing = T, index = T)[[2]],], n = 10)
 ```
 
 
