@@ -1,0 +1,401 @@
+---
+title: "Feb 23rd"
+author: "Rikiya Honda"
+date: "`r lubridate::today()`"
+output:   
+  html_document: 
+    toc: true
+    toc_depth: 4
+    toc_float: 
+      collapsed: true
+      smooth_scroll: true
+    code_folding: 'hide'
+    number_section: false
+    theme: journal
+    highlight: tango
+    smart: true
+    fig_width: 7
+    fig_height: 6
+    fig_caption: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(message = FALSE,
+                      warning = FALSE,
+                      fig.height = 6,
+                      fig.width = 8)
+Sys.setenv(lang = "en")
+```
+
+# 課題１：次の自動車課題について「データセット」を探し，データ分析を行う。
+
+## データセット
+
+
+```{r, echo=FALSE}
+library(tidyverse)
+
+cars <- datasets::cars
+
+
+# show
+DT::datatable(cars, 
+              rownames = FALSE, 
+              extensions = 'Buttons',
+              options = list(autoWidth = FALSE,
+                             pageLength = 5,
+                             dom = 'Bfrtip',
+                             buttons = list("csv"),
+                             scrollX = TRUE,
+                             scrollCollapse = TRUE),
+              class = 'cell-border stripe',
+              caption = "source: ")
+```
+
+
+## データセットの呼び出しを行う
+
+### データの読み込み（インポート）
+(2) データの読み込み（※ディレクトリについて）
+ここでは，主にCSV(Comma Separated Values)ファイルの読み込みについて説明する。
+（注）ディレクトリについて
+・Windowsではメニュー「ファイル」→「ディレクトリの変更」で指定できる
+・Macではメニュー「その他」→「作業ディレクトリの変更」
+実際に，それぞれの環境の中でデータを読み込むときは，ディレクトリの理解が不可欠になる。
+例えば，JドライブのRフォルダにある”sheet1.csv”を読み込むときは次のようにする
+（学院のPC教室ではJドライブに資料を格納しておく）。
+
+```{r, eval=FALSE}
+# データを読み込む
+cars <- read.csv("J:/R/cars.csv")
+```
+
+
+
+## 1.　データの提示
+
+```{r, eval=TRUE}
+head(cars)
+```
+
+
+
+## 2．基本統計量の計算
+
+
+### 平均値・最大値・最小値・中央値
+```{r}
+summary(cars)
+```
+
+### 不偏分散
+```{r}
+lapply(cars[,1:2], var)
+```
+
+### 不偏標準偏差
+```{r}
+lapply(cars[,1:2], sd)
+```
+
+## 3．相関係数の計算
+
+```{r}
+cor(cars[,1], cars[,2])
+```
+
+
+
+
+## 4.　線形モデルの生成
+
+```{r}
+cars.lm <- lm(dist ~ speed, data = cars)
+```
+
+## 回帰直線を方程式を求める　
+
+```{r}
+coef(cars.lm)
+```
+
+
+上記の結果から、今回の回帰係数は、切片が`r coef(cars.lm)[[1]]`で、傾きが`r coef(cars.lm)[[2]]`であることがわかる。これを線形の式に直すと、以下の通りになる。
+
+$$
+dist = `r coef(cars.lm)[[1]]` + `r coef(cars.lm)[[2]]` \times speed
+$$
+
+## 5. 散布図および回帰直線の描画
+
+```{r}
+plot(cars[,1:2],
+     xlab = "",
+     ylab = "")
+abline(cars.lm)
+```
+
+## 6．残差（テキストp.83）の絶対値が比較的大きいデータに注目し、自身の考察を書きなさい。
+
+## 残差を求める
+
+```{r}
+# define the dataset `cars_result`
+cars_result <- data.frame(cars, 
+                      resid = resid(cars.lm), # residuals of the linear model
+                      resid_abs = abs(resid(cars.lm)) # absolute value of the residuals
+                      )
+```
+
+### 並び替える
+
+```{r, eval=TRUE}
+# order `cars_result` 
+head(cars_result[sort(cars_result$resid_abs, decreasing = T, index = T)[[2]],], n = 10)
+```
+
+
+
+## 7．自己ワーク
+[国土交通省の資料「安全な車に乗ろう」](http://www.mlit.go.jp/jidosha/anzen/safetycar.html)
+国土交通省の資料「安全な車に乗ろう」なども参考にし，安全な自動車を設計するために必要な実験や調査を考えたとき，対象となる変量はどのようなものが考えられるだろうか。そして，そこにはどのような因果関係があるか考察しよう。
+
+
+- 対象となる変数
+  * ABSの有無
+  
+- 仮説
+  * ABSの有無がそのスピードから停止する距離に影響する。
+  
+- 実験
+ABSを装備した自動車のと、通常のブレーキを装備した自動車のグループを用意し、同じ条件下で、あるスピードから停止するのにかかる時間を計測する。その後、スピードを説明変数とし、停止距離を目的変数とした回帰モデルにおけるそれぞれの傾きを比較し、ABSが装備されているか否かで停止距離に影響があるのかを検証する。
+
+- 回帰モデル
+ABSを装備した自動車をAグループとし、通常のブレーキを装備した自動車をBグループとする。
+
+$$
+dist_A = \beta_{1_A} + \beta_{2_A} speed_A + u_A
+$$
+
+$$
+dist_B = \beta_{1_B} + \beta_{2_B} speed_B + u_B
+$$
+
+上記の回帰モデルを走らせた後、$\beta_{2_A}$と$\beta_{2_B}$を比べ、違いがあるのかを検証する。
+
+## ファイル提出
+
+コード等をwordに貼って、ファイルを提出する
+
+# 課題２：自分の関心のある課題について「データセット」を探しデータ分析を行い，その結果について回帰分析を考察する。
+
+- 対象となる変数
+  * 説明変数: 攻撃力
+  * 目的変数: 防御力
+  
+- 仮説
+  * 防御力が強くなると、攻撃力も強くなる傾向がある。
+
+
+
+```{r, echo=FALSE}
+library(tidyverse)
+
+url <- "https://raw.githubusercontent.com/Ricky-s-a/R_tutoring/main/Data/car_details_from_car_dekho.csv"
+data <- read.csv(url)
+
+
+# show data
+DT::datatable(data, 
+          rownames = FALSE,
+          options = list(pageLength = 5))
+```
+
+
+## データセットの呼び出しを行う
+
+### データの読み込み（インポート）
+(2) データの読み込み（※ディレクトリについて）
+ここでは，主にCSV(Comma Separated Values)ファイルの読み込みについて説明する。
+（注）ディレクトリについて
+・Windowsではメニュー「ファイル」→「ディレクトリの変更」で指定できる
+・Macではメニュー「その他」→「作業ディレクトリの変更」
+実際に，それぞれの環境の中でデータを読み込むときは，ディレクトリの理解が不可欠になる。
+例えば，JドライブのRフォルダにある”sheet1.csv”を読み込むときは次のようにする
+（学院のPC教室ではJドライブに資料を格納しておく）。
+
+```{r, eval=FALSE}
+# データを読み込む
+data <- read.csv("J:/R/data.csv")
+```
+
+
+
+## 1.　データの提示
+
+```{r, eval=TRUE}
+head(data)
+```
+
+
+
+## 2．基本統計量の計算
+
+
+### 平均値・最大値・最小値・中央値
+```{r}
+summary(data)
+```
+
+### 不偏分散
+```{r}
+lapply(data[,4:5], var)
+```
+
+### 不偏標準偏差
+```{r}
+lapply(data[,4:5], sd)
+```
+
+## 3．相関係数の計算
+
+```{r}
+cor(data[,4], data[,5])
+```
+
+
+
+
+## 4.　線形モデルの生成
+
+```{r}
+data.lm <- lm(selling_price ~ km_driven, data = data)
+```
+
+## 回帰直線を方程式を求める　
+
+```{r}
+coef(data.lm)
+```
+
+
+上記の結果から、今回の回帰係数は、切片が`r coef(data.lm)[[1]]`で、傾きが`r coef(data.lm)[[2]]`であることがわかる。これを線形の式に直すと、以下の通りになる。
+
+$$
+selling_price = `r coef(data.lm)[[1]]` + `r coef(data.lm)[[2]]` \times km_driven
+$$
+
+## 5. 散布図および回帰直線の描画
+
+```{r}
+plot(data$km_driven, data$selling_price
+     # xlab = "",
+     # ylab = ""
+     )
+abline(data.lm)
+```
+
+## 6．残差（テキストp.83）の絶対値が比較的大きいデータに注目し、自身の考察を書きなさい。
+
+## 残差を求める
+
+```{r}
+# define the dataset `data_result`
+data_result <- data.frame(data, 
+                      resid = resid(data.lm), # residuals of the linear model
+                      resid_abs = abs(resid(data.lm)) # absolute value of the residuals
+                      )
+```
+
+### 並び替える
+
+```{r, eval=TRUE}
+# order `data_result` 
+head(data_result[sort(data_result$resid_abs, decreasing = T, index = T)[[2]],], n = 10)
+```
+
+## 考察
+
+- 仮説：中古車ののデータから、走行距離が売却価格に対して負の影響をもつ。
+
+- モデルの説明
+  * 目的変数: 売却価格
+  * 説明変数: 走行距離
+  
+  
+- 結果
+（モデルの係数の説明）
+　うまくいかなかった。残渣を見ればわかる。
+
+
+- 考察 (なぜうまくいかなかったのか)
+  * ブランド車に対して、回帰直線のモデルがうまく説明できていないのではないか。ブランドごとに回帰直線を回したほうがいいのかもしれない。
+  * 取引価格が高いと、モデルがうまく説明できなくなるのではないか。
+  * デーラー経由だとセールス力があるため、値段が高騰する傾向があるのではないか？もしくは、査定代が取引価格に上乗せされているのではないか？
+
+# APPENDIX
+
+## 予測値と残差
+残渣(residuals)は、実際の値と予測値の差分で計算される。
+
+以下の図だと、予測値の青の線と実際の値である赤の線の間が残差である。
+
+```{r}
+# load packages
+library(tidyverse)
+library(modelr)
+library(scales)
+library(plotly)
+
+# define the data for visualization
+data_plot <- data %>%
+  add_predictions(data.lm) %>% 
+  add_residuals(data.lm) %>% 
+  pivot_longer(cols = c(selling_price, pred, resid), names_to = "vars", values_to = "value")
+
+# raw v.s. expected value
+data_plot %>% 
+  filter(vars != "resid") %>% 
+  ggplot(aes(km_driven, value, lable = name, color = vars)) +
+  geom_point() +
+  geom_line() +
+  scale_x_continuous(labels = comma) +
+  scale_y_continuous(labels = comma) +
+  labs(title = "The scatter plot of the predicted value",
+       x = "Driven distance (km)",
+       y = "Selling Price",
+       color = "Name") +
+  theme_minimal()
+```
+
+実際の値であるスピードの変化によって生じる残差の値を、グラフ化したのが以下の図になる。
+
+```{r}
+library(ggrepel)
+
+# residual  
+g1 <- 
+  data_plot %>% 
+  filter(vars == "resid") %>% 
+  ggplot(aes(km_driven, value, label = name)) +
+  geom_hline(yintercept =  0, colour = "black", linetype = "dashed") +
+  geom_point() +
+  geom_line() +
+  # geom_label_repel(nudge_x = TRUE, nudge_y = TRUE, check_overlap = TRUE) +
+  labs(title = "The scatter plot of the residual",
+       x = "Driven Distance (km)",
+       y = "Residuals") +
+  theme_minimal()
+
+ggplotly(g1)
+```
+
+
+  
+  
+
+
+
+
+
+
