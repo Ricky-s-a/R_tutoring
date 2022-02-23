@@ -288,11 +288,11 @@ $$
 ## 5. 散布図および回帰直線の描画
 
 ```{r}
-plot(data$km_driven, data$selling_price
-     # xlab = "",
-     # ylab = ""
+plot(data$km_driven, data$selling_price,
+     xlab = "Driven Distan (km)",
+     ylab = "Selling Prise ($)"
      )
-abline(data.lm)
+abline(data.lm, col = "darkred", lwd = 2)
 ```
 
 ## 6．残差（テキストp.83）の絶対値が比較的大きいデータに注目し、自身の考察を書きなさい。
